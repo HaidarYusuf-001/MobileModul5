@@ -1,0 +1,31 @@
+buildscript {
+    repositories {
+// Periksa apakah sudah menyertakan Maven Google atau tidak.
+        google() // Google's Maven repository
+        mavenCentral()
+    }
+    dependencies {
+// ...
+// Tambahkan baris di bawah ini untuk menyertakan plugin Google Services.
+        classpath 'com.google.gms:google-services:4.3.13' // Google Services plugin
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
