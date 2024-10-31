@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -11,6 +12,7 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   File? _image;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -20,6 +22,23 @@ class _ProfileViewState extends State<ProfileView> {
       setState(() {
         _image = File(pickedFile.path);
       });
+
+      await _uploadImage();
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    if (_image == null) return;
+
+    try {
+      final ref = _storage.ref().child("profile_images/user_profile.jpg"); //ini menyesuaikan dengan akun nya, bisa Uid
+
+      await ref.putFile(_image!);
+
+      final downloadURL = await ref.getDownloadURL();
+      print("Image uploaded successfully: $downloadURL");
+    } catch (e) {
+      print("Failed to upload image: $e");
     }
   }
 
@@ -42,7 +61,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Method untuk membuat AppBar
   AppBar buildAppBar() {
     return AppBar(
       backgroundColor: const Color(0xFF111F2C),
@@ -50,15 +68,15 @@ class _ProfileViewState extends State<ProfileView> {
       title: const Text(
         'Profile',
         style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-            color: Colors.white
+          fontWeight: FontWeight.w600,
+          fontSize: 20,
+          color: Colors.white,
         ),
       ),
       centerTitle: true,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.white), // Mengubah warna tombol back menjadi putih
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () {
           Navigator.pop(context);
         },
@@ -118,7 +136,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Method untuk menampilkan opsi pemilihan gambar
   void _showImagePickerOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -203,7 +220,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Method untuk membuat TextField
   Widget buildTextField({required String label, required String hint}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,7 +265,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Method untuk membuat daftar teman
   Widget buildFriendList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -272,7 +287,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Method untuk membangun avatar teman
   Widget buildFriendAvatar(String imagePath, String name) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),

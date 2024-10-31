@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../register/controllers/auth_controller.dart';
+import '../../todo/views/todo_view.dart';
 import '/app/modules/course/views/course_view.dart';
 import '../controllers/home_controller.dart';
 import '/app/modules/profile/views/profile_view.dart';
@@ -271,6 +272,9 @@ class HomeView extends GetView<HomeController> {
             }
             if (label == 'Book') {
               Get.to(() => HttpView());
+            }
+            if (label == 'Business') {
+              Get.to(() => TodoView());
             }
             // Tambahkan navigasi ke page lain sesuai kebutuhan
           },

@@ -2,9 +2,7 @@ import 'package:codingaja/app/modules/home/views/home_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../views/login_page.dart';
@@ -21,10 +19,7 @@ class AuthController extends GetxController {
       if (user != null) {
         // User is signed in
         _prefs.setBool('isLoggedIn', true); // Store login status
-        Get.offAll(HomeView()); // Navigate to HomeView
-      } else {
-        _prefs.setBool('isLoggedIn', false); // Store login status
-        Get.offAll(LoginPage()); // Navigate to LoginPage
+        Get.offAll(LoginPage()); // Navigate to HomeView
       }
     });
   }

@@ -7,7 +7,7 @@ buildscript {
     dependencies {
 // ...
 // Tambahkan baris di bawah ini untuk menyertakan plugin Google Services.
-        classpath 'com.google.gms:google-services:4.3.13' // Google Services plugin
+        classpath 'com.google.gms:google-services:4.3.14' // Google Services plugin
     }
 }
 
