@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 
 import '../controllers/course_controller.dart';
 
-
 class CourseView extends StatelessWidget {
   const CourseView({super.key});
 
@@ -281,7 +280,6 @@ class CourseView extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
                       if (controller.currentAudioTitle.isNotEmpty)
                         Text(
                           'Playing: ${controller.currentAudioTitle.value}',
@@ -290,7 +288,6 @@ class CourseView extends StatelessWidget {
                             color: Colors.grey[600],
                           ),
                         ),
-                      SizedBox(height: 16),
                       ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
@@ -318,6 +315,31 @@ class CourseView extends StatelessWidget {
                         },
                       ),
                       if (controller.isPlaying.value)
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.pause),
+                                  onPressed: controller.pauseAudio,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.play_arrow),
+                                  onPressed: controller.resumeAudio,
+                                ),
+                              ],
+                            ),
+                            Slider(
+                              value: controller.position.value.inSeconds.toDouble(),
+                              min: 0,
+                              max: controller.duration.value.inSeconds.toDouble(),
+                              onChanged: (value) {
+                                controller.seekAudio(Duration(seconds: value.toInt()));
+                              },
+                            ),
+                          ],
+                        ),
                         ElevatedButton(
                           onPressed: controller.stopAudio,
                           child: Text('Stop Audio'),
