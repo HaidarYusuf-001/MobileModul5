@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api/firebase_api.dart';
+import 'app/modules/home/controllers/microphone_controller.dart';
 import 'firebase_options.dart';
 
 import 'app/modules/register/controllers/auth_controller.dart';
@@ -13,6 +14,7 @@ import 'app/routes/app_pages.dart';
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
+  Get.put(MicrophoneController());
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase

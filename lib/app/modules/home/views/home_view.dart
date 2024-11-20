@@ -1,3 +1,4 @@
+import 'package:codingaja/app/modules/home/controllers/microphone_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../register/controllers/auth_controller.dart';
@@ -8,18 +9,28 @@ import '/app/modules/profile/views/profile_view.dart';
 import '/app/modules/history/views/history_view.dart';
 import '/app/modules/http_screen/views/http_view.dart';
 
-class HomeView extends GetView<HomeController> {
-  const HomeView({super.key});
+class HomeView extends GetView<MicrophoneController> {
+  // Declare the TextEditingController
+  final TextEditingController _controller = TextEditingController();
+  final authController = Get.find<AuthController>();
+  HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>(); // Get AuthController instance
+    // Mengupdate _controller text setiap ada perubahan pada controller.text
+    controller.text.listen((value) {
+      _controller.text = value;
+      _controller.selection = TextSelection.collapsed(
+          offset: value.length);});// Menjaga kursor tetap di akhir
+    // Get AuthController instance
 
     return Scaffold(
       appBar: _buildAppBar(),
       body: _buildBody(),
       bottomNavigationBar: _buildBottomNavigationBar(authController), // Pass authController
     );
+
+
   }
 
   PreferredSize _buildAppBar() {
@@ -196,7 +207,33 @@ class HomeView extends GetView<HomeController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSearchField(),
+        TextField(
+        controller: _controller, // Pastikan _controller adalah TextEditingController
+        decoration: InputDecoration(
+          hintText: 'Cari sesuatu dengan suara...',
+          prefixIcon: IconButton(
+            icon: const Icon(Icons.mic),
+            onPressed: () async {
+              if (controller.isListening.value) {
+                // Jika sedang mendengarkan, hentikan mendengarkan
+                controller.stopListening();
+              } else {
+                // Mulai mendengarkan ketika tombol mikrofon ditekan
+                await controller.startListening();
+              }
+            },
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14.0),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        onChanged: (value) {
+          // Memastikan controller.text adalah Rx<String> jika menggunakan GetX
+          controller.text.value = value;
+        },
+      ),
           const SizedBox(height: 18.0),
           Expanded(
             child: ListView(
@@ -224,20 +261,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  TextField _buildSearchField() {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'What do you want to learn today?',
-        prefixIcon: const Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.0),
-          borderSide: BorderSide.none,
-        ),
-        filled: true,
-        fillColor: Colors.white,
-      ),
-    );
-  }
+
 
   Row _buildMenuRow(List<dynamic> item1, List<dynamic> item2,
       List<dynamic> item3, List<dynamic> item4) {
