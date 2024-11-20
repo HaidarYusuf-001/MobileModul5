@@ -6,7 +6,6 @@ import 'app_color.dart';
 import 'create_task_screen.dart';
 import 'widget_background.dart';
 
-
 class TodoView extends StatefulWidget {
   @override
   _TodoScreenState createState() => _TodoScreenState();
@@ -41,7 +40,7 @@ class _TodoScreenState extends State<TodoView> {
       ),
       body: SafeArea(
         child: Stack(
-          children: <Widget>[
+          children: [
             WidgetBackground(),
             _buildWidgetListTodo(context),
           ],
@@ -60,7 +59,7 @@ class _TodoScreenState extends State<TodoView> {
   Widget _buildWidgetListTodo(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
+      children: [
         Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -106,7 +105,7 @@ class _TodoScreenState extends State<TodoView> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: appColor.colorPrimary.withOpacity(0.2),
+                        color: appColor.colorTertiary.withOpacity(0.2),
                         width: 1,
                       ),
                     ),
@@ -253,7 +252,7 @@ class _TodoScreenState extends State<TodoView> {
           return AlertDialog(
             title: Text('Delete Task'),
             content: Text('Are you sure you want to delete "${task['name']}"?'),
-            actions: <Widget>[
+            actions: [
               TextButton(
                 child: Text('Cancel'),
                 onPressed: () => Navigator.pop(context),

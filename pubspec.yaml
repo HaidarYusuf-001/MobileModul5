@@ -44,6 +44,7 @@ dependencies:
   flutter_local_notifications: ^17.2.4
   firebase_messaging: ^15.1.3
   firebase_storage: ^12.3.4
+  audioplayers: ^5.2.1
 
 
 
@@ -67,6 +68,7 @@ flutter:
     #    - assets/images/yy.png
     #    - assets/images/CV.png
     - assets/images/
+    - assets/audio/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

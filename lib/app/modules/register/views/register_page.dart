@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../controllers/auth_controller.dart';
+import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -45,7 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 Text(
                   'Register',
                   style: TextStyle(
-                    fontFamily: 'Poppins', // Use Poppins font
+                    fontFamily: 'Poppins',
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue.shade800,
@@ -77,6 +77,19 @@ class _RegisterPageState extends State<RegisterPage> {
                         : Text('Register'),
                   );
                 }),
+                SizedBox(height: 16),
+                GestureDetector(
+                  onTap: () {
+                    Get.to(LoginPage());
+                  },
+                  child: Text(
+                    'Sudah punya akun? Login',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'app_color.dart';
 import 'widget_background.dart';
 
-
 class CreateTaskScreen extends StatefulWidget {
   final bool isEdit;
   final String documentId, name, description, date;
@@ -78,7 +77,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onLongPress: () => Navigator.pop(context),
             child: _iconContainer(Icons.arrow_back),
           ),
           SizedBox(height: 24),
@@ -177,11 +176,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide:
-          BorderSide(color: appColor.colorPrimary.withOpacity(0.2))),
+          BorderSide(color: appColor.colorTertiary.withOpacity(0.2))),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide:
-          BorderSide(color: appColor.colorPrimary.withOpacity(0.2))),
+          BorderSide(color: appColor.colorTertiary.withOpacity(0.2))),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: appColor.colorTertiary)),
@@ -203,9 +202,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     return Container(
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
-          color: appColor.colorPrimary.withOpacity(0.1),
+          color: appColor.colorTertiary.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8)),
-      child: Icon(icon, color: appColor.colorTertiary),
+      child: Icon(
+        icon,
+        color: Colors.black,
+      ),
     );
   }
 
@@ -215,7 +217,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       context: context,
       initialDate: date,
       firstDate: today,
-      lastDate: DateTime(2101),
+      lastDate: DateTime(2026),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: ColorScheme.light(

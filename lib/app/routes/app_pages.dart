@@ -20,7 +20,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.REGISTER;
+  static const INITIAL = Routes.HOME;
   static const Home = Routes.HOME;
 
   static final routes = [

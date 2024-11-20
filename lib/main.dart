@@ -31,7 +31,7 @@ void main() async {
   // Delay initial route check
   String initialRoute = AppPages.INITIAL; // Default to initial route
   await Future.delayed(Duration.zero, () async {
-    initialRoute = Get.find<AuthController>().isLoggedIn() ? AppPages.Home : AppPages.INITIAL;
+    initialRoute = Get.find<AuthController>().isSignedIn() ? AppPages.Home : AppPages.INITIAL;
   });
 
   runApp(

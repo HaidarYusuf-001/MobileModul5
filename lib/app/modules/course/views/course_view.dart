@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
+
+import '../controllers/course_controller.dart';
+
 
 class CourseView extends StatelessWidget {
   const CourseView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final CourseController controller = Get.put(CourseController());
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -16,13 +20,10 @@ class CourseView extends StatelessWidget {
             Stack(
               children: [
                 Container(
-                  height: MediaQuery.of(context).size.height *
-                      0.4, // Menetapkan tinggi header
+                  height: MediaQuery.of(context).size.height * 0.4,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage(
-                        'assets/images/piano.jpeg', // Gambar dari assets
-                      ),
+                      image: AssetImage('assets/images/piano.jpeg'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -33,15 +34,14 @@ class CourseView extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white, // Warna background lingkaran
+                      color: Colors.white,
                     ),
-                    padding: EdgeInsets.all(
-                        1), // Padding untuk ruang di sekitar ikon
+                    padding: EdgeInsets.all(1),
                     child: IconButton(
                       icon: Icon(
                         Icons.arrow_back,
                         color: Color.fromARGB(255, 17, 31, 44),
-                      ), // Warna ikon menjadi 4A6DFA
+                      ),
                       onPressed: () {
                         Get.back();
                       },
@@ -71,16 +71,14 @@ class CourseView extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Color(0xFFEBEBEB), // Warna border lingkaran
-                            width: 2, // Ketebalan garis lingkaran
+                            color: Color(0xFFEBEBEB),
+                            width: 2,
                           ),
                         ),
-                        padding: EdgeInsets.all(
-                            8), // Padding untuk memberikan ruang di sekitar ikon
+                        padding: EdgeInsets.all(8),
                         child: Icon(
-                          Icons
-                              .bookmark_border, // Menggunakan ikon bookmark outline
-                          color: Colors.black, // Warna garis luar menjadi hitam
+                          Icons.bookmark_border,
+                          color: Colors.black,
                         ),
                       ),
                     ],
@@ -90,9 +88,8 @@ class CourseView extends StatelessWidget {
                   Row(
                     children: [
                       CircleAvatar(
-                        backgroundImage: AssetImage(
-                          'assets/images/author_avatar.png', // Gambar avatar dari assets
-                        ),
+                        backgroundImage:
+                        AssetImage('assets/images/author_avatar.png'),
                       ),
                       SizedBox(width: 8),
                       Column(
@@ -100,7 +97,6 @@ class CourseView extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              // Nama dan Music
                               Text(
                                 'Richard Bustos',
                                 style: TextStyle(
@@ -109,23 +105,19 @@ class CourseView extends StatelessWidget {
                                   color: Color(0xFFA4A4A4),
                                 ),
                               ),
-                              SizedBox(width: 8), // Jarak antara nama dan Music
+                              SizedBox(width: 8),
                               Container(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4), // Padding di dalam kotak
+                                    horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Color(
-                                      0xFFF3E6F7), // Warna background kotak
-                                  borderRadius: BorderRadius.circular(
-                                      4), // Corner radius 8
+                                  color: Color(0xFFF3E6F7),
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   'Music',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color:
-                                        Color(0xFFFA58F0), // Warna teks Music
+                                    color: Color(0xFFFA58F0),
                                   ),
                                 ),
                               ),
@@ -140,21 +132,17 @@ class CourseView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // Published Section
                       Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white, // Background putih
-                          borderRadius:
-                              BorderRadius.circular(20), // Corner radius 20
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.edit_calendar_outlined,
-                              color: Color.fromARGB(255, 17, 31, 44),
-                            ), // Warna ikon
-                            SizedBox(width: 8), // Jarak antara ikon dan teks
+                            Icon(Icons.edit_calendar_outlined,
+                                color: Color.fromARGB(255, 17, 31, 44)),
+                            SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -178,21 +166,17 @@ class CourseView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // Enrolled Section
                       Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white, // Background putih
-                          borderRadius:
-                              BorderRadius.circular(20), // Corner radius 20
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.people_outlined,
-                              color: Color.fromARGB(255, 17, 31, 44),
-                            ), // Warna ikon
-                            SizedBox(width: 8), // Jarak antara ikon dan teks
+                            Icon(Icons.people_outlined,
+                                color: Color.fromARGB(255, 17, 31, 44)),
+                            SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -229,16 +213,14 @@ class CourseView extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    'Dive Deep into the Fundamentals of Design Principles, '
-                    'Master the Latest Tools and Techniques, and Gain Insightful '
-                    'Industry Perspectives from Seasoned Professionals.',
+                    'Dive Deep into the Fundamentals of Design Principles...',
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.normal,
                         color: Color(0xFFA4A4A4)),
                   ),
                   SizedBox(height: 40),
-                  // Course sections
+                  // Courses Section
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -250,15 +232,12 @@ class CourseView extends StatelessWidget {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(
-                          width:
-                              8), // Jarak antara "Courses" dan jumlah sections
+                      SizedBox(width: 8),
                       Text(
-                        '(12 sections ~ 7 hours 34 minutes)', // Teks yang diletakkan di samping "Courses"
+                        '(12 sections ~ 7 hours 34 minutes)',
                         style: TextStyle(
-                          fontSize: 14, // Ukuran teks diubah menjadi 14
-                          color: Color(
-                              0xFFA4A4A4), // Warna teks diubah menjadi #A4A4A4
+                          fontSize: 14,
+                          color: Color(0xFFA4A4A4),
                         ),
                       ),
                     ],
@@ -266,8 +245,7 @@ class CourseView extends StatelessWidget {
                   ListTile(
                     leading: Text('01.',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)), // Menjaga penomoran
+                            fontWeight: FontWeight.bold, fontSize: 16)),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -275,45 +253,77 @@ class CourseView extends StatelessWidget {
                           'Design Hierarchy:',
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 14, // Ukuran font yang sama
-                            color: Colors.black, // Warna yang sama
+                            fontSize: 14,
+                            color: Colors.black,
                           ),
                         ),
                         Text(
                           "Hik's Law Approach",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
-                            fontSize: 14, // Ukuran font yang sama
-                            color: Colors.black, // Warna yang sama
+                            fontSize: 14,
+                            color: Colors.black,
                           ),
                         ),
                       ],
                     ),
-                    trailing: Row(
-                      mainAxisSize:
-                          MainAxisSize.min, // Menghindari pemborosan ruang
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.remove_red_eye_outlined,
-                                size: 20,
-                                color: Color(
-                                    0xFFA4A4A4)), // Mengubah warna ikon play
-                            SizedBox(width: 4),
-                            Text('327',
-                                style: TextStyle(
-                                    color: Color(0xFFA4A4A4),
-                                    fontSize:
-                                        14)), // Warna teks 327 juga diubah
-                          ],
-                        ),
-                        SizedBox(width: 60), // Jarak antara play dan lock icon
-                        Icon(Icons.lock_outline,
-                            color:
-                                Color(0xFFA4A4A4)), // Mengubah warna ikon lock
-                      ],
-                    ),
+                    trailing: Icon(Icons.lock_outline, color: Color(0xFFA4A4A4)),
                   ),
+                  SizedBox(height: 16),
+                  // Audio Player Section
+                  Obx(() => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Audio Player',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      if (controller.currentAudioTitle.isNotEmpty)
+                        Text(
+                          'Playing: ${controller.currentAudioTitle.value}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      SizedBox(height: 16),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: controller.audioList.length,
+                        itemBuilder: (context, index) {
+                          final audio = controller.audioList[index];
+                          return ListTile(
+                            title: Text(audio['title']!),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.play_arrow,
+                                color: controller.currentAudioTitle.value ==
+                                    audio['title']
+                                    ? Colors.green
+                                    : Colors.grey,
+                              ),
+                              onPressed: () {
+                                controller.playAudio(
+                                  audio['file']!,
+                                  audio['title']!,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                      if (controller.isPlaying.value)
+                        ElevatedButton(
+                          onPressed: controller.stopAudio,
+                          child: Text('Stop Audio'),
+                        ),
+                    ],
+                  )),
                   SizedBox(height: 45),
                   // Price and Buy button
                   Row(

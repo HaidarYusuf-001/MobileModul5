@@ -17,17 +17,16 @@ class AuthController extends GetxController {
     super.onInit();
     _auth.authStateChanges().listen((user) {
       if (user != null) {
-        // User is signed in
-        _prefs.setBool('isLoggedIn', true); // Store login status
-        Get.offAll(LoginPage()); // Navigate to HomeView
+        _prefs.setBool('isSignedIn', true);
+        Get.offAll(LoginPage());
       }
     });
   }
 
   void logout() async {
     await _auth.signOut();
-    _prefs.setBool('isLoggedIn', false); // Update login status in SharedPreferences
-    Get.offAll(LoginPage()); // Navigate to LoginPage() after logout
+    _prefs.setBool('isSignedIn', false);
+    Get.offAll(LoginPage());
   }
 
   Future<void> registerUser(String email, String password) async {
@@ -39,8 +38,6 @@ class AuthController extends GetxController {
       );
       Get.snackbar('Success', 'Registration successful',
           backgroundColor: Colors.green);
-      // No need to navigate to LoginPage() here,
-      // auth state listener will handle it
     } on FirebaseAuthException catch (e) {
       Get.snackbar('Error', e.message!, backgroundColor: Colors.red);
     } finally {
@@ -58,12 +55,11 @@ class AuthController extends GetxController {
       Get.snackbar('Success', 'Login successful',
           backgroundColor: Colors.green);
     } on FirebaseAuthException catch (e) {
-      Get.snackbar('Error', e.message!, backgroundColor: Colors.red);
     } finally {
       isLoading.value = false;
     }
   }
-  bool isLoggedIn() {
-    return _prefs.getBool('isLoggedIn') ?? false; // Get login status, default to false
+  bool isSignedIn() {
+    return _prefs.getBool('isSignedIn') ?? false;
   }
 }

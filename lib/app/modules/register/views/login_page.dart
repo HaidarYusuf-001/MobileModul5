@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     'Login',
                     style: TextStyle(
-                      fontFamily: 'Poppins', // Use Poppins font
+                      fontFamily: 'Poppins',
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue.shade800,
