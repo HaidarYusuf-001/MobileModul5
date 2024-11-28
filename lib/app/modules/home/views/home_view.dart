@@ -21,7 +21,9 @@ class HomeView extends GetView<MicrophoneController> {
     controller.text.listen((value) {
       _controller.text = value;
       _controller.selection = TextSelection.collapsed(
-          offset: value.length);});// Menjaga kursor tetap di akhir
+          offset: value.length);
+    }
+    );// Menjaga kursor tetap di akhir
     // Get AuthController instance
 
     return Scaffold(

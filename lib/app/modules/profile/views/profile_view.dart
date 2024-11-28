@@ -1,7 +1,10 @@
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:geocoding/geocoding.dart';
+
+import 'location_page.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -12,7 +15,9 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   File? _image;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final TextEditingController _alamatController = TextEditingController();
+  late double latitude;
+  late double longitude;
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -22,25 +27,54 @@ class _ProfileViewState extends State<ProfileView> {
       setState(() {
         _image = File(pickedFile.path);
       });
-
-      await _uploadImage();
     }
   }
 
-  Future<void> _uploadImage() async {
-    if (_image == null) return;
-
+  Future<void> _getAddressFromCoordinates() async {
     try {
-      final ref = _storage.ref().child("profile_images/user_profile.jpg"); //ini menyesuaikan dengan akun nya, bisa Uid
-
-      await ref.putFile(_image!);
-
-      final downloadURL = await ref.getDownloadURL();
-      print("Image uploaded successfully: $downloadURL");
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        String address = "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+        setState(() {
+          _alamatController.text = address; // Memasukkan alamat ke TextField
+        });
+      }
     } catch (e) {
-      print("Failed to upload image: $e");
+      print("Gagal mendapatkan alamat: $e");
     }
   }
+
+  void _openGoogleMaps() async {
+    final String googleMapsUrl = "https://www.google.com/maps?q=$latitude,$longitude";
+    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+      await launchUrl(Uri.parse(googleMapsUrl));
+    } else {
+      throw 'Could not open Google Maps';
+    }
+  }
+
+
+  // Update bagian untuk menampilkan halaman LocationPage dan mengirimkan lokasi ke field Alamat
+  void _openLocationPage() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LocationPage(
+          onLocationSelected: (location) {
+            setState(() {
+              _alamatController.text = location;
+              final coordinates = location.split(",");
+              latitude = double.parse(coordinates[0]);
+              longitude = double.parse(coordinates[1]);
+            });
+          },
+        ),
+      ),
+    );
+    await _getAddressFromCoordinates();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +88,6 @@ class _ProfileViewState extends State<ProfileView> {
             const SizedBox(height: 30),
             buildProfileForm(),
             const SizedBox(height: 30),
-            buildFriendList(),
           ],
         ),
       ),
@@ -186,12 +219,59 @@ class _ProfileViewState extends State<ProfileView> {
           const SizedBox(height: 15),
           buildTextField(label: 'Username', hint: 'Masukkan username!'),
           const SizedBox(height: 15),
-          buildTextField(label: 'Alamat', hint: 'Masukkan alamat!'),
+          buildTextField(label: 'Alamat', hint: 'Masukkan alamat!', controller: _alamatController),
           const SizedBox(height: 15),
           buildTextField(label: 'Umur', hint: 'Masukkan umur!'),
           const SizedBox(height: 15),
           buildTextField(label: 'Institusi', hint: 'Masukkan institusi!'),
           const SizedBox(height: 30),
+
+          // Cari Lokasi Saya button
+          ElevatedButton(
+            onPressed: _openLocationPage,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF111F2C),
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              elevation: 8,
+            ),
+            child: const Text(
+              'Cari Lokasi Saya',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          // Tampilkan Lokasi Saya button
+          ElevatedButton(
+            onPressed: _openGoogleMaps,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF111F2C),
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              elevation: 8,
+            ),
+            child: const Text(
+              'Tampilkan Lokasi Saya',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
           Center(
             child: ElevatedButton(
               onPressed: () {
@@ -220,7 +300,7 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget buildTextField({required String label, required String hint}) {
+  Widget buildTextField({required String label, required String hint, TextEditingController? controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -246,6 +326,7 @@ class _ProfileViewState extends State<ProfileView> {
             ],
           ),
           child: TextField(
+            controller: controller,
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: const TextStyle(color: Colors.grey),
@@ -264,8 +345,10 @@ class _ProfileViewState extends State<ProfileView> {
       ],
     );
   }
+}
 
-  Widget buildFriendList() {
+
+Widget buildFriendList() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Row(
@@ -306,4 +389,3 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
-}
