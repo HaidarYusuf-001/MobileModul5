@@ -220,55 +220,66 @@ class _ProfileViewState extends State<ProfileView> {
           buildTextField(label: 'Username', hint: 'Masukkan username!'),
           const SizedBox(height: 15),
           buildTextField(label: 'Alamat', hint: 'Masukkan alamat!', controller: _alamatController),
+          const SizedBox(height: 5),
+          // Cari Lokasi Saya button
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _openLocationPage,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF111F2C),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 8,
+                  ),
+                  child: const Text(
+                    'Track using AI',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _openGoogleMaps,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF111F2C),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 8,
+                  ),
+                  child: const Text(
+                    'View on Gmaps',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
+,
+
           const SizedBox(height: 15),
+
+
           buildTextField(label: 'Umur', hint: 'Masukkan umur!'),
           const SizedBox(height: 15),
           buildTextField(label: 'Institusi', hint: 'Masukkan institusi!'),
           const SizedBox(height: 30),
 
-          // Cari Lokasi Saya button
-          ElevatedButton(
-            onPressed: _openLocationPage,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF111F2C),
-              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-              elevation: 8,
-            ),
-            child: const Text(
-              'Cari Lokasi Saya',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-          ),
 
-          const SizedBox(height: 15),
-
-          // Tampilkan Lokasi Saya button
-          ElevatedButton(
-            onPressed: _openGoogleMaps,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF111F2C),
-              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-              ),
-              elevation: 8,
-            ),
-            child: const Text(
-              'Tampilkan Lokasi Saya',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-          ),
 
           const SizedBox(height: 30),
 
