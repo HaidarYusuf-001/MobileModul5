@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geocoding/geocoding.dart';
+import 'dart:math';
 
 import 'location_page.dart';
 
@@ -18,6 +20,9 @@ class _ProfileViewState extends State<ProfileView> {
   final TextEditingController _alamatController = TextEditingController();
   late double latitude;
   late double longitude;
+
+  final double latTempatLes = -7.920662;
+  final double lonTempatLes = 112.593743;
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -54,6 +59,15 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
+  void _openGoogleMapsTempatLes() async {
+    final String googleMapsUrl = "https://www.google.com/maps?q=$latTempatLes,$lonTempatLes";
+    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+      await launchUrl(Uri.parse(googleMapsUrl));
+    } else {
+      throw 'Could not open Google Maps';
+    }
+  }
+
 
   // Update bagian untuk menampilkan halaman LocationPage dan mengirimkan lokasi ke field Alamat
   void _openLocationPage() async {
@@ -73,6 +87,68 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
     await _getAddressFromCoordinates();
+  }
+
+  Future<void> _getUserLocation() async {
+    // Memeriksa izin lokasi
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Handle jika izin ditolak selamanya
+      return;
+    }
+
+    // Mendapatkan lokasi pengguna saat ini
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      latitude = position.latitude;
+      longitude = position.longitude;
+    });
+
+    // Mendapatkan alamat berdasarkan koordinat pengguna
+    await _getAddressFromCoordinates();
+  }
+
+  // Menghitung jarak antara dua titik menggunakan rumus Haversine
+  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const R = 6371; // Radius bumi dalam km
+    final dLat = _degToRad(lat2 - lat1);
+    final dLon = _degToRad(lon2 - lon1);
+    final a = (sin(dLat / 2) * sin(dLat / 2)) +
+        (cos(_degToRad(lat1)) * cos(_degToRad(lat2)) * sin(dLon / 2) * sin(dLon / 2));
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    final distance = R * c; // Dalam km
+    return distance;
+  }
+
+  // Mengubah derajat ke radian
+  double _degToRad(double deg) {
+    return deg * (pi / 180);
+  }
+
+  // Fungsi untuk menampilkan jarak ke Universitas Brawijaya
+  void _showDistanceToTempatLes() {
+    double distance = _calculateDistance(latitude, longitude, latTempatLes, lonTempatLes);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Jarak ke Tempat Les'),
+          content: Text('Jarak Anda saat ini ke Tempat Les adalah: ${distance.toStringAsFixed(2)} km'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
 
@@ -204,6 +280,55 @@ class _ProfileViewState extends State<ProfileView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _showDistanceToTempatLes,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF111F2C),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 8,
+                  ),
+                  child: const Text(
+                    'Hitung Jarak',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10), // Untuk memberikan jarak antara tombol
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _openGoogleMapsTempatLes,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF111F2C),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 8,
+                  ),
+                  child: const Text(
+                    'Lokasi tempat les',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
           const Text(
             'Lengkapi Profil',
             style: TextStyle(
@@ -268,21 +393,12 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
             ],
-          )
-,
-
+          ),
           const SizedBox(height: 15),
-
-
           buildTextField(label: 'Umur', hint: 'Masukkan umur!'),
           const SizedBox(height: 15),
           buildTextField(label: 'Institusi', hint: 'Masukkan institusi!'),
           const SizedBox(height: 30),
-
-
-
-          const SizedBox(height: 30),
-
           Center(
             child: ElevatedButton(
               onPressed: () {
@@ -310,6 +426,7 @@ class _ProfileViewState extends State<ProfileView> {
       ),
     );
   }
+
 
   Widget buildTextField({required String label, required String hint, TextEditingController? controller}) {
     return Column(
