@@ -55,7 +55,7 @@ class _LocationPageState extends State<LocationPage> {
       });
 
       // Mengirim lokasi kembali ke halaman profil
-      widget.onLocationSelected("$latitude,$longitude, $address");
+      widget.onLocationSelected("$latitude,$longitude");
     } catch (e) {
       setState(() {
         _location = "Gagal mendapatkan lokasi: $e";
@@ -122,9 +122,9 @@ class _LocationPageState extends State<LocationPage> {
                             ),
                             const SizedBox(width: 8),
                             Image.asset(
-                              'assets/images/notof.png', // Ganti dengan path gambar Anda
-                              width: 20, // Ukuran gambar kecil
-                              height: 20, // Ukuran gambar kecil
+                              'assets/images/kucingbingung.png', // Ganti dengan path gambar Anda
+                              width: 30, // Ukuran gambar kecil
+                              height: 30, // Ukuran gambar kecil
                             ),
                           ],
                         ),

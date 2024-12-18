@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:codingaja/app/modules/utils/internet_connection_utils.dart';
+import 'package:codingaja/app/modules/utils/popups/snackbars.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:intl/intl.dart';
-
+import 'package:shared_preferences/shared_preferences.dart'; // Local storage for offline data
 import 'app_color.dart';
 import 'widget_background.dart';
 
@@ -31,6 +35,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   DateTime date = DateTime.now().add(Duration(days: 1));
   bool isLoading = false;
 
+  late Connectivity _connectivity;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   @override
   void initState() {
     super.initState();
@@ -42,7 +49,69 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     } else {
       controllerDate.text = DateFormat('dd MMMM yyyy').format(date);
     }
+
+    _connectivity = Connectivity();
+    _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> result) {
+      _handleConnectivityChange(result);
+    });
   }
+
+  Future<void> _handleConnectivityChange(List<ConnectivityResult> result) async  {
+    if (_isUploading) return;
+    if (result != ConnectivityResult.none) {
+      await _uploadLocalDataToFirestore();
+    }
+  }
+
+  bool _isUploading = false; // Tambahkan flag global
+
+  Future<void> _uploadLocalDataToFirestore() async {
+    if (_isUploading) return; // Cegah pengiriman data jika sudah berjalan
+    _isUploading = true;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? name = prefs.getString('task_name');
+    String? description = prefs.getString('task_description');
+    String? dueDate = prefs.getString('task_dueDate');
+
+    if (name != null && description != null && dueDate != null) {
+      try {
+        await firestore.collection('todo').add({
+          'name': name,
+          'description': description,
+          'date': dueDate,
+        });
+
+        // Hapus data lokal setelah berhasil diunggah
+        await prefs.remove('task_name');
+        await prefs.remove('task_description');
+        await prefs.remove('task_dueDate');
+
+        TSnackbar.successSnackBar(
+          title: 'Data Synced',
+          message: 'Offline data has been synced successfully.',
+        );
+      } catch (e) {
+        TSnackbar.errorSnackBar(
+          title: 'Sync Error',
+          message: 'Failed to sync offline data. Please try again.',
+        );
+      }
+    }
+
+    _isUploading = false; // Reset flag setelah proses selesai
+  }
+
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    controllerName.dispose();
+    controllerDescription.dispose();
+    controllerDate.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +261,6 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   BoxDecoration _containerDecoration() {
     return BoxDecoration(
       color: Colors.white,
-      // borderRadius: BorderRadius.only(
-      //     topLeft: Radius.circular(32), topRight: Radius.circular(32)),
       borderRadius: BorderRadius.circular(32),
     );
   }
@@ -239,40 +306,81 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     String name = controllerName.text,
         description = controllerDescription.text,
         dueDate = controllerDate.text;
-    if (name.isEmpty || description.isEmpty)
-      return _showSnackBarMessage(name.isEmpty
-          ? 'Please enter task name'
-          : 'Please enter task description');
 
-    setState(() => isLoading = true);
+    if (name.isEmpty || description.isEmpty) {
+      _showSnackBarMessage(
+        name.isEmpty ? 'Please enter task name' : 'Please enter task description',
+      );
+      return;
+    }
+
+    // Check internet connectivity using TInternetConnectionUtils
+    bool isConnected = await TInternetConnectionUtils.checkConnection();
+
+    if (!isConnected) {
+      // Offline: Save data locally and show custom Snackbar
+      _saveDataLocally(name, description, dueDate);
+      TSnackbar.warningSnackBar(
+        title: 'No Internet Connection',
+        message: 'Your task will be saved locally and synced when online.',
+      );
+
+      // Navigate to TodoView after showing the snackbar
+      Future.delayed(Duration(milliseconds: 1500), () {
+        Navigator.of(context).pushNamedAndRemoveUntil('/todoview', (route) => false);
+      });
+      return;
+    }
+
+    // If connected: Save task to Firestore
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       if (widget.isEdit) {
         DocumentReference taskRef = firestore.doc('todo/${widget.documentId}');
         await firestore.runTransaction((transaction) async {
           if ((await transaction.get(taskRef)).exists) {
-            await transaction.update(taskRef,
-                {'name': name, 'description': description, 'date': dueDate});
-            Navigator.pop(context, true);
+            await transaction.update(taskRef, {
+              'name': name,
+              'description': description,
+              'date': dueDate,
+            });
           }
         });
+        Navigator.pop(context, true);
       } else {
-        DocumentReference result = await firestore
-            .collection('todo')
-            .add({'name': name, 'description': description, 'date': dueDate});
+        DocumentReference result = await firestore.collection('todo').add({
+          'name': name,
+          'description': description,
+          'date': dueDate,
+        });
         if (result.id.isNotEmpty) Navigator.pop(context, true);
       }
     } catch (e) {
-      _showSnackBarMessage('An error occurred. Please try again.');
+      _showSnackBarMessage('Error: Unable to save task');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
-    setState(() => isLoading = false);
   }
+
 
   void _showSnackBarMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: appColor.colorTertiary,
-        shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: appColor.colorTertiary,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    ));
+  }
+
+  Future<void> _saveDataLocally(String name, String description, String dueDate) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('task_name', name);
+    prefs.setString('task_description', description);
+    prefs.setString('task_dueDate', dueDate);
   }
 }

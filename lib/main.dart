@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api/firebase_api.dart';
 import 'app/modules/home/controllers/microphone_controller.dart';
+import 'app/modules/todo/controller/connection_controller.dart';
+import 'dependency_injection.dart';
 import 'firebase_options.dart';
 
 import 'app/modules/register/controllers/auth_controller.dart';
@@ -35,6 +37,8 @@ void main() async {
   await Future.delayed(Duration.zero, () async {
     initialRoute = Get.find<AuthController>().isSignedIn() ? AppPages.Home : AppPages.INITIAL;
   });
+  DependencyInjection.init();
+  Get.put(ConnectionController());
 
   runApp(
     GetMaterialApp(

@@ -1,4 +1,6 @@
 import 'package:codingaja/app/modules/register/views/register_page.dart';
+import 'package:codingaja/app/modules/todo/bindings/todo_binding.dart';
+import 'package:codingaja/app/modules/todo/views/todo_view.dart';
 
 import '../modules/course/views/course_view.dart';
 import '../modules/home/views/home_view.dart';
@@ -20,7 +22,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.HOME;
+  static const INITIAL = Routes.REGISTER;
   static const Home = Routes.HOME;
 
   static final routes = [
@@ -58,6 +60,11 @@ class AppPages {
       name: _Paths.REGISTER,
       page: () => RegisterPage(),
       binding: HttpBinding(),
+    ),
+    GetPage(
+      name: _Paths.TODOVIEW,
+      page: () => TodoView(),
+      binding: TodoBinding(),
     ),
   ];
 }

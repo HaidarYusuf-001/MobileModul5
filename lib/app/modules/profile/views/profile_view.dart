@@ -60,7 +60,7 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   void _openGoogleMapsTempatLes() async {
-    final String googleMapsUrl = "https://www.google.com/maps?q=$latTempatLes,$lonTempatLes";
+    final String googleMapsUrl = "https://www.google.com/maps/dir/?api=1&origin=$latitude,$longitude&destination=$latTempatLes,$lonTempatLes";
     if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
       await launchUrl(Uri.parse(googleMapsUrl));
     } else {
@@ -89,28 +89,7 @@ class _ProfileViewState extends State<ProfileView> {
     await _getAddressFromCoordinates();
   }
 
-  Future<void> _getUserLocation() async {
-    // Memeriksa izin lokasi
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Handle jika izin ditolak selamanya
-      return;
-    }
-
-    // Mendapatkan lokasi pengguna saat ini
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      latitude = position.latitude;
-      longitude = position.longitude;
-    });
-
-    // Mendapatkan alamat berdasarkan koordinat pengguna
-    await _getAddressFromCoordinates();
-  }
+  
 
   // Menghitung jarak antara dua titik menggunakan rumus Haversine
   double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {

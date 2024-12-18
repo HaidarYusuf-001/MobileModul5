@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_color.dart';
 import 'create_task_screen.dart';
@@ -15,6 +17,31 @@ class _TodoScreenState extends State<TodoView> {
   final GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final AppColor appColor = AppColor();
+  List<Map<String, String>> offlineTasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedTasks();
+  }
+
+  // Memuat tugas yang disimpan secara offline
+  Future<void> _loadSavedTasks() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? name = prefs.getString('task_name');
+    String? description = prefs.getString('task_description');
+    String? dueDate = prefs.getString('task_dueDate');
+
+    if (name != null && description != null && dueDate != null) {
+      setState(() {
+        offlineTasks.add({
+          'name': name,
+          'description': description,
+          'date': dueDate,
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +54,7 @@ class _TodoScreenState extends State<TodoView> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: appColor.backgroundColor),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.offNamed('/home'),
         ),
         title: Text(
           'Todo app',
@@ -42,7 +69,7 @@ class _TodoScreenState extends State<TodoView> {
         child: Stack(
           children: [
             WidgetBackground(),
-            _buildWidgetListTodo(context),
+            _buildWidgetListTodo(),
           ],
         ),
       ),
@@ -56,7 +83,8 @@ class _TodoScreenState extends State<TodoView> {
     );
   }
 
-  Widget _buildWidgetListTodo(BuildContext context) {
+  // Membangun widget untuk menampilkan daftar tugas
+  Widget _buildWidgetListTodo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -88,15 +116,24 @@ class _TodoScreenState extends State<TodoView> {
                 );
               }
 
+              List<Map<String, String>> tasks = [];
+              snapshot.data!.docs.forEach((document) {
+                Map<String, dynamic> task = document.data() as Map<String, dynamic>;
+                tasks.add({
+                  'name': task['name'],
+                  'description': task['description'],
+                  'date': task['date'],
+                });
+              });
+
+              // Gabungkan tugas online dan offline
+              tasks.addAll(offlineTasks);
+
               return ListView.builder(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-                itemCount: snapshot.data!.docs.length,
+                itemCount: tasks.length,
                 itemBuilder: (context, index) {
-                  DocumentSnapshot document = snapshot.data!.docs[index];
-                  Map<String, dynamic> task =
-                  document.data() as Map<String, dynamic>;
-                  String strDate = task['date'];
-
+                  Map<String, String> task = tasks[index];
                   return Card(
                     color: appColor.textColor.withOpacity(0.8),
                     elevation: 0,
@@ -113,7 +150,7 @@ class _TodoScreenState extends State<TodoView> {
                       contentPadding: EdgeInsets.only(
                           left: 16, right: 16, top: 8, bottom: 8),
                       title: Text(
-                        task['name'],
+                        task['name']!,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 18,
@@ -125,21 +162,18 @@ class _TodoScreenState extends State<TodoView> {
                         children: [
                           SizedBox(height: 8),
                           Text(
-                            task['description'],
+                            task['description']!,
                             style: TextStyle(
                               color: appColor.backgroundColor.withOpacity(0.7),
                             ),
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          // SizedBox(height: 3),
-                          // Garis pemisah antara deskripsi dan tanggal
                           Divider(
                             color: appColor.backgroundColor
-                                .withOpacity(0.5), // Warna garis
-                            thickness: 1, // Ketebalan garis
+                                .withOpacity(0.5),
+                            thickness: 1,
                           ),
-                          // SizedBox(height: 3),
                           Row(
                             children: [
                               Icon(
@@ -149,7 +183,7 @@ class _TodoScreenState extends State<TodoView> {
                               ),
                               SizedBox(width: 4),
                               Text(
-                                strDate,
+                                task['date']!,
                                 style: TextStyle(
                                   color: appColor.backgroundColor,
                                   fontSize: 12,
@@ -159,38 +193,23 @@ class _TodoScreenState extends State<TodoView> {
                           ),
                         ],
                       ),
-                      trailing: PopupMenuButton(
-                        icon: Icon(
-                          Icons.more_vert,
-                          color: appColor.backgroundColor.withOpacity(0.5),
-                        ),
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit, size: 20),
-                                SizedBox(width: 8),
-                                Text('Edit'),
-                              ],
+                      trailing: PopupMenuButton<String>(
+                        icon: Icon(Icons.more_vert, color: appColor.backgroundColor),
+                        onSelected: (String value) {
+                          _handleMenuSelection(value, snapshot.data!.docs[index], task, context);
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return [
+                            PopupMenuItem<String>(
+                              value: 'edit',
+                              child: Text('Edit'),
                             ),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete,
-                                    size: 20, color: appColor.textColor),
-                                SizedBox(width: 8),
-                                Text('Delete',
-                                    style:
-                                    TextStyle(color: appColor.textColor)),
-                              ],
+                            PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Text('Delete'),
                             ),
-                          ),
-                        ],
-                        onSelected: (value) => _handleMenuSelection(
-                            value, document, task, context),
+                          ];
+                        },
                       ),
                     ),
                   );
@@ -203,6 +222,7 @@ class _TodoScreenState extends State<TodoView> {
     );
   }
 
+  // Menavigasi ke halaman pembuatan tugas
   Future<void> _navigateToCreateTask(BuildContext context) async {
     bool? result = await Navigator.push(
       context,
@@ -220,6 +240,7 @@ class _TodoScreenState extends State<TodoView> {
     }
   }
 
+  // Menangani pemilihan menu (edit atau delete)
   void _handleMenuSelection(String value, DocumentSnapshot document,
       Map<String, dynamic> task, BuildContext context) async {
     if (value == 'edit') {
