@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:codingaja/app/modules/utils/popups/snackbars.dart';
+import 'package:belajardek/app/modules/utils/popups/snackbars.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class TInternetConnectionUtils {

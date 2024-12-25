@@ -1,6 +1,6 @@
-import 'package:codingaja/app/modules/register/views/register_page.dart';
-import 'package:codingaja/app/modules/todo/bindings/todo_binding.dart';
-import 'package:codingaja/app/modules/todo/views/todo_view.dart';
+import 'package:belajardek/app/modules/register/views/register_page.dart';
+import 'package:belajardek/app/modules/todo/bindings/todo_binding.dart';
+import 'package:belajardek/app/modules/todo/views/todo_view.dart';
 
 import '../modules/course/views/course_view.dart';
 import '../modules/home/views/home_view.dart';
@@ -17,12 +17,15 @@ import '../modules/book_details/bindings/book_binding.dart';
 import '../modules/http_screen/bindings/http_binding.dart';
 import 'package:get/get.dart';
 
+import '../modules/splash_screen/bindings/splash_binding.dart';
+import '../modules/splash_screen/views/splash_view.dart';
+
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.REGISTER;
+  static const INITIAL = Routes.SPLASH;
   static const Home = Routes.HOME;
 
   static final routes = [
@@ -35,6 +38,11 @@ class AppPages {
       name: _Paths.PROFILE,
       page: () => const ProfileView(),
       binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.SPLASH,
+      page: () => SplashView(),
+      binding: SplashBinding(),
     ),
     GetPage(
       name: _Paths.COURSE,

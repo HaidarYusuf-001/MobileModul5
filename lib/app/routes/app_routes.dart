@@ -11,6 +11,7 @@ abstract class Routes {
   static const BOOK = _Paths.BOOK;
   static const REGISTER = _Paths.REGISTER;
   static const TODOVIEW = _Paths.TODOVIEW;
+  static const SPLASH = _Paths.SPLASH;
 }
 
 abstract class _Paths {
@@ -23,4 +24,5 @@ abstract class _Paths {
   static const BOOK = '/book_details';
   static const REGISTER = '/register';
   static const TODOVIEW = '/todoview';
+  static const SPLASH = '/splash';
 }

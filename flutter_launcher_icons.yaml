@@ -1,0 +1,7 @@
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/belajardek.png"  # Path ke ikon aplikasi Anda
+  adaptive_icon:
+    android: true  # Jika Anda ingin menggunakan adaptive icon di Android
+    foreground: "assets/icons/belajardek.png"  # Path untuk gambar foreground

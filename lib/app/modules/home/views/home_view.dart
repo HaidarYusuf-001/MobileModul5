@@ -1,4 +1,4 @@
-import 'package:codingaja/app/modules/home/controllers/microphone_controller.dart';
+import 'package:belajardek/app/modules/home/controllers/microphone_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../register/controllers/auth_controller.dart';
@@ -242,7 +242,7 @@ class HomeView extends GetView<MicrophoneController> {
               children: [
                 _buildMenuRow(
                   ['Coding', Icons.code],
-                  ['Business', Icons.business],
+                  ['To-Do', Icons.business],
                   ['Math', Icons.calculate],
                   ['Arts', Icons.brush],
                 ),

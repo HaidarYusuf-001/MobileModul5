@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:codingaja/app/modules/utils/internet_connection_utils.dart';
-import 'package:codingaja/app/modules/utils/popups/snackbars.dart';
+import 'package:belajardek/app/modules/utils/internet_connection_utils.dart';
+import 'package:belajardek/app/modules/utils/popups/snackbars.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Local storage for offline data
@@ -146,7 +147,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
-            onLongPress: () => Navigator.pop(context),
+            onTap: () => Get.offNamed('/todoview'),
             child: _iconContainer(Icons.arrow_back),
           ),
           SizedBox(height: 24),

@@ -1,5 +1,5 @@
-import 'package:codingaja/app/modules/home/views/home_view.dart';
-import 'package:codingaja/app/modules/notif/notification_page.dart';
+import 'package:belajardek/app/modules/home/views/home_view.dart';
+import 'package:belajardek/app/modules/notif/notification_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

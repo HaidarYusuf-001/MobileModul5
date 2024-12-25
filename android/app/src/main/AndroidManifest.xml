@@ -12,7 +12,7 @@
 
 
     <application
-        android:label="codingaja"
+        android:label="Belajar Dek"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
