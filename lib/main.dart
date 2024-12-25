@@ -1,5 +1,6 @@
-import 'package:belajardek/app/modules/home/views/home_view.dart';
-import 'package:belajardek/app/modules/notif/notification_page.dart';
+import 'package:learnhub/app/modules/home/views/home_view.dart';
+import 'package:learnhub/app/modules/notif/notification_page.dart';
+import 'package:learnhub/permission_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,14 +17,22 @@ import 'app/routes/app_pages.dart';
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  Get.put(MicrophoneController());
   WidgetsFlutterBinding.ensureInitialized();
+  bool allPermissionsGranted = await PermissionManager.requestAllPermissions();
+  if (!allPermissionsGranted) {
+    print("Some permissions are not granted. The app might not function properly.");
+  }
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseApi().initNotifications();
+
+  Get.put(MicrophoneController());
+
 
   // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
 
   // Initialize notifications
-  await FirebaseApi().initNotifications();
+
 
   // Initialize SharedPreferences
   final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -31,14 +40,16 @@ void main() async {
 
   // Initialize AuthController
   Get.put(AuthController());
+  DependencyInjection.init();
+  Get.put(ConnectionController());
 
   // Delay initial route check
   String initialRoute = AppPages.INITIAL; // Default to initial route
   await Future.delayed(Duration.zero, () async {
     initialRoute = Get.find<AuthController>().isSignedIn() ? AppPages.Home : AppPages.INITIAL;
   });
-  DependencyInjection.init();
-  Get.put(ConnectionController());
+
+
 
   runApp(
     GetMaterialApp(

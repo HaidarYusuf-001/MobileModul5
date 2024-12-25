@@ -1,6 +1,6 @@
-import 'package:belajardek/app/modules/register/views/register_page.dart';
-import 'package:belajardek/app/modules/todo/bindings/todo_binding.dart';
-import 'package:belajardek/app/modules/todo/views/todo_view.dart';
+import 'package:learnhub/app/modules/register/views/register_page.dart';
+import 'package:learnhub/app/modules/todo/bindings/todo_binding.dart';
+import 'package:learnhub/app/modules/todo/views/todo_view.dart';
 
 import '../modules/course/views/course_view.dart';
 import '../modules/home/views/home_view.dart';

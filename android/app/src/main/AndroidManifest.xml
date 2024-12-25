@@ -12,7 +12,7 @@
 
 
     <application
-        android:label="Belajar Dek"
+        android:label="LearnHub"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

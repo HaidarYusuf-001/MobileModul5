@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/auth_controller.dart';
-import 'package:belajardek/app/modules/home/views/home_view.dart';
+import 'package:learnhub/app/modules/home/views/home_view.dart';
 
 class LoginPage extends StatefulWidget {
   @override

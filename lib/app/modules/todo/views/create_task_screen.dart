@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:belajardek/app/modules/utils/internet_connection_utils.dart';
-import 'package:belajardek/app/modules/utils/popups/snackbars.dart';
+import 'package:learnhub/app/modules/utils/internet_connection_utils.dart';
+import 'package:learnhub/app/modules/utils/popups/snackbars.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

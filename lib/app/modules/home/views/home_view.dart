@@ -1,4 +1,4 @@
-import 'package:belajardek/app/modules/home/controllers/microphone_controller.dart';
+import 'package:learnhub/app/modules/home/controllers/microphone_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../register/controllers/auth_controller.dart';

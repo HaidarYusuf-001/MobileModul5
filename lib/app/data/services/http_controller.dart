@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:belajardek/app/data/models/buku_models.dart';
+import 'package:learnhub/app/data/models/buku_models.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 
