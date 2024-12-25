@@ -10,6 +10,7 @@ abstract class Routes {
   static const HTTP = _Paths.HTTP;
   static const BOOK = _Paths.BOOK;
   static const REGISTER = _Paths.REGISTER;
+  static const SPLASH = _Paths.SPLASH;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const HTTP = '/http';
   static const BOOK = '/book_details';
   static const REGISTER = '/register';
+  static const SPLASH = '/splash';
 }

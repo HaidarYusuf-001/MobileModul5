@@ -24,7 +24,8 @@ void main() async {
   await FirebaseApi().initNotifications();
 
   // Initialize SharedPreferences
-  final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   Get.put(sharedPreferences);
 
   // Initialize AuthController
@@ -33,7 +34,9 @@ void main() async {
   // Delay initial route check
   String initialRoute = AppPages.INITIAL; // Default to initial route
   await Future.delayed(Duration.zero, () async {
-    initialRoute = Get.find<AuthController>().isSignedIn() ? AppPages.Home : AppPages.INITIAL;
+    initialRoute = Get.find<AuthController>().isSignedIn()
+        ? AppPages.Home
+        : AppPages.INITIAL;
   });
 
   runApp(

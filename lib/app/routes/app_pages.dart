@@ -1,4 +1,6 @@
 import 'package:codingaja/app/modules/register/views/register_page.dart';
+import 'package:codingaja/app/modules/splash_screen/bindings/splash_binding.dart';
+import 'package:codingaja/app/modules/splash_screen/views/splash_view.dart';
 
 import '../modules/course/views/course_view.dart';
 import '../modules/home/views/home_view.dart';
@@ -20,7 +22,7 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.HOME;
+  static const INITIAL = Routes.SPLASH;
   static const Home = Routes.HOME;
 
   static final routes = [
@@ -28,6 +30,11 @@ class AppPages {
       name: _Paths.HOME,
       page: () => HomeView(),
       binding: HomeBinding(),
+    ),
+    GetPage(
+      name: _Paths.SPLASH,
+      page: () => SplashView(),
+      binding: SplashBinding(),
     ),
     GetPage(
       name: _Paths.PROFILE,
