@@ -77,7 +77,7 @@ class HomeView extends GetView<MicrophoneController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Kevin Juliette 👋',
+              'Sobat LearnHub 👋',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 22,
@@ -299,7 +299,7 @@ class HomeView extends GetView<MicrophoneController> {
             if (label == 'Book') {
               Get.to(() => HttpView());
             }
-            if (label == 'Business') {
+            if (label == 'To-Do') {
               Get.to(() => TodoView());
             }
             // Tambahkan navigasi ke page lain sesuai kebutuhan

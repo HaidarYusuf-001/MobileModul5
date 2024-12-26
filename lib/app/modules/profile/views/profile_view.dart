@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geocoding/geocoding.dart';
 import 'dart:math';
@@ -17,12 +18,99 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   File? _image;
+  final TextEditingController _namaController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _alamatController = TextEditingController();
-  late double latitude;
-  late double longitude;
+  final TextEditingController _umurController = TextEditingController();
+  final TextEditingController _institusiController = TextEditingController();
+
+  late double latitude = 0.0;
+  late double longitude = 0.0;
 
   final double latTempatLes = -7.920662;
   final double lonTempatLes = 112.593743;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    _emailController.dispose();
+    _usernameController.dispose();
+    _alamatController.dispose();
+    _umurController.dispose();
+    _institusiController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveProfileData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      // Save text fields
+      await prefs.setString('nama', _namaController.text);
+      await prefs.setString('email', _emailController.text);
+      await prefs.setString('username', _usernameController.text);
+      await prefs.setString('alamat', _alamatController.text);
+      await prefs.setString('umur', _umurController.text);
+      await prefs.setString('institusi', _institusiController.text);
+
+      // Save coordinates
+      await prefs.setDouble('latitude', latitude);
+      await prefs.setDouble('longitude', longitude);
+
+      // Save image path
+      if (_image != null) {
+        await prefs.setString('imagePath', _image!.path);
+      }
+
+      // Show success message
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile berhasil disimpan!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error menyimpan profile: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _loadProfileData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      setState(() {
+        _namaController.text = prefs.getString('nama') ?? '';
+        _emailController.text = prefs.getString('email') ?? '';
+        _usernameController.text = prefs.getString('username') ?? '';
+        _alamatController.text = prefs.getString('alamat') ?? '';
+        _umurController.text = prefs.getString('umur') ?? '';
+        _institusiController.text = prefs.getString('institusi') ?? '';
+        latitude = prefs.getDouble('latitude') ?? 0.0;
+        longitude = prefs.getDouble('longitude') ?? 0.0;
+
+        String? imagePath = prefs.getString('imagePath');
+        if (imagePath != null && File(imagePath).existsSync()) {
+          _image = File(imagePath);
+        }
+      });
+    } catch (e) {
+      print('Error loading profile data: $e');
+    }
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -42,7 +130,7 @@ class _ProfileViewState extends State<ProfileView> {
         Placemark place = placemarks[0];
         String address = "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
         setState(() {
-          _alamatController.text = address; // Memasukkan alamat ke TextField
+          _alamatController.text = address;
         });
       }
     } catch (e) {
@@ -68,8 +156,6 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
-
-  // Update bagian untuk menampilkan halaman LocationPage dan mengirimkan lokasi ke field Alamat
   void _openLocationPage() async {
     final result = await Navigator.push(
       context,
@@ -89,26 +175,21 @@ class _ProfileViewState extends State<ProfileView> {
     await _getAddressFromCoordinates();
   }
 
-  
-
-  // Menghitung jarak antara dua titik menggunakan rumus Haversine
   double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-    const R = 6371; // Radius bumi dalam km
+    const R = 6371;
     final dLat = _degToRad(lat2 - lat1);
     final dLon = _degToRad(lon2 - lon1);
     final a = (sin(dLat / 2) * sin(dLat / 2)) +
         (cos(_degToRad(lat1)) * cos(_degToRad(lat2)) * sin(dLon / 2) * sin(dLon / 2));
     final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    final distance = R * c; // Dalam km
+    final distance = R * c;
     return distance;
   }
 
-  // Mengubah derajat ke radian
   double _degToRad(double deg) {
     return deg * (pi / 180);
   }
 
-  // Fungsi untuk menampilkan jarak ke Universitas Brawijaya
   void _showDistanceToTempatLes() {
     double distance = _calculateDistance(latitude, longitude, latTempatLes, lonTempatLes);
     showDialog(
@@ -129,7 +210,6 @@ class _ProfileViewState extends State<ProfileView> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +252,6 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Method untuk membuat Header Profil
   Widget buildProfileHeader() {
     return Container(
       width: double.infinity,
@@ -252,152 +331,145 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  // Method untuk membuat Form Profil
   Widget buildProfileForm() {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _showDistanceToTempatLes,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF111F2C),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    elevation: 8,
-                  ),
-                  child: const Text(
-                    'Hitung Jarak',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10), // Untuk memberikan jarak antara tombol
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _openGoogleMapsTempatLes,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF111F2C),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    elevation: 8,
-                  ),
-                  child: const Text(
-                    'Lokasi tempat les',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+      Row(
+      children: [
+      Expanded(
+      child: ElevatedButton(
+        onPressed: _showDistanceToTempatLes,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF111F2C),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
           ),
-
-          const SizedBox(height: 20),
-          const Text(
-            'Lengkapi Profil',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-              color: Colors.black87,
-            ),
+          elevation: 8,
+        ),
+        child: const Text(
+          'Hitung Jarak',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
           ),
-          const SizedBox(height: 20),
-          buildTextField(label: 'Nama Lengkap', hint: 'Masukkan nama lengkap!'),
+        ),
+      ),
+    ),
+    const SizedBox(width: 10),
+    Expanded(
+    child: ElevatedButton(
+    onPressed: _openGoogleMapsTempatLes,
+    style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF111F2C),
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(18),
+    ),
+    elevation: 8,
+    ),
+    child: const Text(
+    'Lokasi tempat les',
+    style: TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    fontSize: 14,
+    ),
+    ),
+    ),
+    ),
+    ],
+    ),
+    const SizedBox(height: 20),
+    const Text(
+    'Lengkapi Profil',
+    style: TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 24,
+    color: Colors.black87,
+    ),
+    ),
+    const SizedBox(height: 20),
+    buildCustomTextField('Nama Lengkap', 'Masukkan nama lengkap!', _namaController),
+    const SizedBox(height: 15),
+    buildCustomTextField('Email', 'Masukkan email!', _emailController),
+    const SizedBox(height: 15),
+    buildCustomTextField('Username', 'Masukkan username!', _usernameController),
+    const SizedBox(height: 15),
+    buildCustomTextField('Alamat', 'Masukkan alamat!', _alamatController),
+    const SizedBox(height: 5),
+    Row(
+    children: [
+    Expanded(
+    child: ElevatedButton(
+    onPressed: _openLocationPage,
+    style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF111F2C),
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(18),
+    ),
+    elevation: 8,
+    ),
+    child: const Text(
+    'Track using AI',
+    style: TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    fontSize: 14,
+    ),
+    ),
+    ),
+    ),
+    const SizedBox(width: 5),
+    Expanded(
+    child: ElevatedButton(
+    onPressed: _openGoogleMaps,
+    style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF111F2C),
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(18),
+    ),
+    elevation: 8,
+    ),
+    child: const Text(
+    'View on Gmaps',
+    style: TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    fontSize: 14,
+    ),
+    ),
+    ),
+    ),
+    ],
+    ),
+    const SizedBox(height: 15),
+          buildCustomTextField('Umur', 'Masukkan umur!', _umurController),
           const SizedBox(height: 15),
-          buildTextField(label: 'Email', hint: 'Masukkan email!'),
-          const SizedBox(height: 15),
-          buildTextField(label: 'Username', hint: 'Masukkan username!'),
-          const SizedBox(height: 15),
-          buildTextField(label: 'Alamat', hint: 'Masukkan alamat!', controller: _alamatController),
-          const SizedBox(height: 5),
-          // Cari Lokasi Saya button
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _openLocationPage,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF111F2C),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    elevation: 8,
-                  ),
-                  child: const Text(
-                    'Track using AI',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _openGoogleMaps,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF111F2C),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    elevation: 8,
-                  ),
-                  child: const Text(
-                    'View on Gmaps',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          buildTextField(label: 'Umur', hint: 'Masukkan umur!'),
-          const SizedBox(height: 15),
-          buildTextField(label: 'Institusi', hint: 'Masukkan institusi!'),
+          buildCustomTextField('Institusi', 'Masukkan institusi!', _institusiController),
           const SizedBox(height: 30),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                // Save logic
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF111F2C),
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                elevation: 8,
+          ElevatedButton(
+            onPressed: _saveProfileData,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF111F2C),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
               ),
-              child: const Text(
-                'Save',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+              elevation: 8,
+            ),
+            child: const Text(
+              'Simpan Profil',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
           ),
@@ -406,93 +478,17 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-
-  Widget buildTextField({required String label, required String hint, TextEditingController? controller}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: Colors.black87,
-          ),
+  Widget buildCustomTextField(
+      String labelText, String hintText, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
         ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(0, 3),
-              ),
-            ],
-          ),
-          child: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: Colors.grey),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: const BorderSide(color: Color(0xFF1C5D99), width: 1.5),
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
-
-
-Widget buildFriendList() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Temanmu',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          Row(
-            children: [
-              buildFriendAvatar('assets/images/yy.png', 'Han'),
-              buildFriendAvatar('assets/images/yy.png', 'Han'),
-              buildFriendAvatar('assets/images/yy.png', 'Han'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildFriendAvatar(String imagePath, String name) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundImage: AssetImage(imagePath),
-            backgroundColor: Colors.transparent,
-          ),
-          const SizedBox(height: 5),
-          Text(
-            name,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
